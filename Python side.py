@@ -1,12 +1,11 @@
 import time
 import os
 import csv
-file_path='G:\\1Platinum\\autobot'
+file_path='C:\\Users\\computer lab\\Desktop'
 #_------------------------------------------------------
 def donothing():
      print()
      pass
-
 def set_log(user, timein, timeout):
     global log_list
     log_list={'user':user,'Time-in':timein,'Time-out':timeout}
@@ -19,7 +18,6 @@ def view_log():
         for q in lg:
             print(q,end='\n')
     print('...Current session exculded...')
-
 def access(user):
     global u_s
     u_s=str(user)
@@ -35,22 +33,6 @@ def access(user):
     else:
         print('Access denied-FALSE USER')
         return False
-def login(user):
-    global aquaint
-    aquaint=access(user)
-    i=3
-    while i>0:
-        aquaint
-        if aquaint==False:
-            print('Try again')
-            access(user)
-        else:
-            break
-            return True
-    else:
-        print('Unable to log you in! Sorry :-(')
-        return False
-        
 def create(user,pswd):
     global new_ppl    
     if user in auth_ppl:
@@ -67,7 +49,6 @@ def create(user,pswd):
         else:
             print('...')
         return False
-    
 def new_poll2(): #CSV version
     global con_list
     global log_time
@@ -113,7 +94,20 @@ def new_poll2(): #CSV version
         read=csv.reader(f)
         for q in read:
             print(q)
-        
+def log_set():
+    log_session_out=time.asctime(time.localtime())
+    set_log(u_n, log_session_in,log_session_out)
+    
+def read_contents():
+    with open(recent_open,'r+') as poll:
+        r=csv.reader(poll)
+        for i in r:
+            print(i)
+            
+def update_file_name():
+    global recent_open
+    recent_file.append(file_name)
+    recent_open=recent_file.pop()   
     
 '''    
 def choose_poll():
@@ -128,21 +122,21 @@ def choose_poll():
         
         else:
             print('Back to login page')
-'''        
-def log_set():
-    log_session_out=time.asctime(time.localtime())
-    set_log(u_n, log_session_in,log_session_out)
-    
-def read_contents():
-    with open(recent_open,'r+') as poll:
-        r=csv.reader(poll)
-        for i in r:
-            print(i)
-            
-def update_file_name():
-    global recent_open
-    recent_file.append(file_name)
-    recent_open=recent_file.pop()
+'''
+'''def login(user):
+    i=3
+    while i>0:
+        if access(user)==False:
+            print('Try again')
+            return
+         else:
+            break
+            return True
+    else:
+        print('Unable to log you in! Sorry :-(')
+        return False
+  '''
+
             
         
         
@@ -157,7 +151,8 @@ title=''
 print('You are requesting to access the ADMIN previdgles\nKindly authorize yourself')
 u_n=str(input('Enter Us.name: '))
 cur_user=u_n.capitalize()
-login()    
+aquaint=access(u_n)
+aquaint
 if aquaint==True:
 #Create a empty file to store and fetch data
     try:
