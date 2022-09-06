@@ -36,9 +36,11 @@ def access(user):
         print('Access denied-FALSE USER')
         return False
 def login(user):
+    global aquaint
+    aquaint=access(user)
     i=3
     while i>0:
-        access(user)
+        aquaint
         if aquaint==False:
             print('Try again')
             access(user)
@@ -154,10 +156,8 @@ title=''
 #________________Menu access for user_____________
 print('You are requesting to access the ADMIN previdgles\nKindly authorize yourself')
 u_n=str(input('Enter Us.name: '))
-aquaint=login(u_n)
-aquaint
 cur_user=u_n.capitalize()
-    
+login()    
 if aquaint==True:
 #Create a empty file to store and fetch data
     try:
