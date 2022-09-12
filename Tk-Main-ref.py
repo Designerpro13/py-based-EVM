@@ -59,13 +59,14 @@ def polls(): #mypolls
         pollnames.append(ndata)
     psel=StringVar()
     mpolls=Toplevel()
-    mpolls.geometry('270x200')
+    mpolls.geometry('300x300')
+    mpolls['bg']='#FAF0E6'
     mpolls.title('Voting Program')
     Label(mpolls,text='Select Poll',font='Helvetica 12 bold').grid(row=1,column=3)
     select=ttk.Combobox(mpolls,values=pollnames,state='readonly',textvariable=psel)
-    select.grid(row=2,column=3)
+    select.grid(row=2,column=3,padx=10,pady=10)
     select.current(0)
-    Button(mpolls,text='Proceed',command=proceed).grid(row=2,column=4)
+    Button(mpolls,text='Proceed',command=proceed).grid(row=2,column=4,padx=5,pady=5)
 
 
 
@@ -99,14 +100,15 @@ def create():
     name=StringVar()
     cname=StringVar()
     cr=Toplevel()
-    cr.geometry('500x400')
+    cr.geometry('560x440')
+    cr['bg']='#FAF0E6'
     cr.title('Create a new poll')
     Label(cr,text='Enter Details',font='Helvetica 12 bold').grid(row=1,column=2)
     Label(cr,text='Enter Poll name: ').grid(row=2,column=1)
-    Entry(cr,width=30,textvariable=name).grid(row=2,column=2) #poll name
-    Label(cr,text='(eg: captain elections)').place(x=354,y=25)
-    Label(cr,text='Enter Candidates: ').grid(row=3,column=1)
-    Entry(cr,width=45,textvariable=cname).grid(row=3,column=2) #candidate name
+    Entry(cr,width=40,textvariable=name).grid(row=2,column=2,padx=2,pady=3,sticky='nsw') #poll name
+    Label(cr,text='(eg: captain elections)').place(x=353,y=35)
+    Label(cr,text='Enter Candidates: ').grid(row=3,column=1,columnspan=1,padx=2,pady=3)
+    Entry(cr,width=40,textvariable=cname).grid(row=3,column=2,columnspan=1,padx=2,pady=3,sticky='w') #candidate name
     Label(cr,text='Note: Enter the candidate names one by one by putting commas').grid(row=4,column=2)
     Label(cr,text='eg: candidate1,candate2,candidate3....').grid(row=5,column=2)
     Button(cr,text='Proceed',command=proceed).grid(row=6,column=2)
@@ -153,6 +155,7 @@ def selpl(): #pollresults
     sele=StringVar()
     pl=Toplevel()
     pl.geometry('300x200')
+    pl['bg']='#FAF0E6'
     pl.title('Voting System')
     Label(pl,text='Select Poll',font='Helvetica 12 bold').grid(row=1,column=1)
     sel=ttk.Combobox(pl,values=pollnames,state='readonly',textvariable=sele)
@@ -162,16 +165,17 @@ def selpl(): #pollresults
 def about():
     messagebox.showinfo('About','Developed by Andrew')
 
-
+#______________________________________________________________________
 home=Tk()
-home.geometry('400x400')
+home.geometry('350x460')
 home.title('Voting Program')
-home['bg'] = '#49A'
-Label(home,text='voting program made in python',font='Helvetica 12 bold',bg='#49A').grid(row=1,column=2)
-Button(home,text='Create new Poll +',command=create).grid(row=3,column=2)
-Button(home,text='My Polls',command=polls).grid(row=4,column=2)
-Button(home,text='Poll Results',command=selpl).grid(row=5,column=2)
-Label(home,text='GitHub:https://github.com/andrew-geeks',bg='#49A').grid(row=6,column=2)
-Label(home,text='Instagram:https://www.instagram.com/_andrewgeeks/',bg='#49A').grid(row=7,column=2)
-Button(home,text='About',command=about).grid(row=1,column=3)
+home['bg'] = '#FAF0E6'
+Label(home,text='Voting program made in python',font='Helvetica 12 bold',bg='#FAF0E6').grid(row=0,column=1,columnspan=2, pady=5)
+Button(home,text='Create new Poll +',command=create,width=20).grid(row=4,column=1,pady=5,padx=10,columnspan=1)
+Button(home,text='My Polls',command=polls,width=20).grid(row=4,column=2,pady=5,padx=10,columnspan=1)
+Button(home,text='Poll Results',command=selpl,width = 20).grid(row=5,column=1,pady=5,padx=10,columnspan=1)
+Button(home,text='About',command=about,width=20).grid(row=5,column=2)  
+#Label(home,text='GitHub:https://github.com/andrew-geeks',bg='#49A').grid(row=6,column=2)
+#Label(home,text='Instagram:https://www.instagram.com/_andrewgeeks/',bg='#49A').grid(row=7,column=2)
+
 home.mainloop()
