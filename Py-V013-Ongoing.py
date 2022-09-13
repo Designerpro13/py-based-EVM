@@ -11,6 +11,21 @@ cursor=conn.cursor() #main cursor
 cursor.execute("""CREATE TABLE IF NOT EXISTS poll
                     (name)""")
 
+def login(user, passw):
+    qua=oplevel()
+    
+    try:
+        Label(qua,text='LOGIN',font='Ariel 15').grid(row=1,column=2,columnspan=2,padx=5,pady=5)
+        Label(qua,text='Username',font='Ariel 15').grid(row=2,column=1,padx=5,pady=5)
+        Entry(qua,text='Username',textvariable='user',font='Ariel 15').grid(row=2,column=2,padx=5,pady=5)
+        Label(qua,text='Username',font='Ariel 15').grid(row=2,column=1,padx=5,pady=5)
+        Entry(qua,text='Username',textvariable='user',font='Ariel 15').grid(row=2,column=2,padx=5,pady=5)
+        qua.destroy()
+        return
+    except:
+        qua.destroy()
+        sys.exit()
+
 def pollpage(): #page for polling
      def proceed():
         chose=choose.get()
@@ -108,7 +123,7 @@ def create():
     Entry(cr,width=40,textvariable=name).grid(row=2,column=2,padx=2,pady=3,sticky='nsw') #poll name
     Label(cr,text='(eg: captain elections)').place(x=353,y=35)
     Label(cr,text='Enter Candidates: ').grid(row=3,column=1,columnspan=1,padx=2,pady=3)
-    Entry(cr,width=40,textvariable=cname).grid(row=3,column=2,columnspan=1,padx=2,pady=3,sticky='w') #candidate name
+    Entry(cr,width=40,textvariable=cname,font='Sans 12').grid(row=3,column=2,columnspan=1,padx=2,pady=3,sticky='w') #candidate name
     Label(cr,text='Note: Enter the candidate names one by one by putting commas').grid(row=4,column=2)
     Label(cr,text='eg: candidate1,candate2,candidate3....').grid(row=5,column=2)
     Button(cr,text='Proceed',command=proceed).grid(row=6,column=2)
@@ -167,14 +182,15 @@ def about():
 
 #______________________________________________________________________
 home=Tk()
-home.geometry('350x460')
+home.geometry('340x340')
 home.title('Voting Program')
-home['bg'] = '#FAF0E6'
-Label(home,text='Voting program made in python',font='Helvetica 12 bold',bg='#FAF0E6').grid(row=0,column=1,columnspan=2, pady=5)
-Button(home,text='Create new Poll +',command=create,width=20).grid(row=4,column=1,pady=5,padx=10,columnspan=1)
-Button(home,text='My Polls',command=polls,width=20).grid(row=4,column=2,pady=5,padx=10,columnspan=1)
-Button(home,text='Poll Results',command=selpl,width = 20).grid(row=5,column=1,pady=5,padx=10,columnspan=1)
-Button(home,text='About',command=about,width=20).grid(row=5,column=2)  
+home.iconbitmap('C:\\Users\\computer lab\\Desktop\\V-111\\qqq.ico')
+home['bg'] = '#00CCFF'
+Label(home,text='Voting program made in python',font='Helvetica 12 italic',bg='#00CCFF').pack(pady=5)
+Button(home,text='Create new Poll +',command=create,width=20).pack(pady=5,padx=10)
+Button(home,text='My Polls',command=polls,width=20).pack(pady=5,padx=10)
+Button(home,text='Poll Results',command=selpl,width = 20).pack(pady=5,padx=10)
+Button(home,text='About',command=about,width=20).pack(padx=5,pady=5)  
 #Label(home,text='GitHub:https://github.com/andrew-geeks',bg='#49A').grid(row=6,column=2)
 #Label(home,text='Instagram:https://www.instagram.com/_andrewgeeks/',bg='#49A').grid(row=7,column=2)
 
