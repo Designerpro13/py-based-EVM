@@ -6,26 +6,52 @@ from tkinter import simpledialog
 from tkinter import filedialog as fd
 import sqlite3 as sqltor
 import matplotlib.pyplot as plt
+import time
 conn=sqltor.connect('main.db') #main database
 cursor=conn.cursor() #main cursor
 cursor.execute("""CREATE TABLE IF NOT EXISTS poll
                     (name)""")
 
-def login(user, passw):
-    qua=oplevel()
-    
-    try:
-        Label(qua,text='LOGIN',font='Ariel 15').grid(row=1,column=2,columnspan=2,padx=5,pady=5)
-        Label(qua,text='Username',font='Ariel 15').grid(row=2,column=1,padx=5,pady=5)
-        Entry(qua,text='Username',textvariable='user',font='Ariel 15').grid(row=2,column=2,padx=5,pady=5)
-        Label(qua,text='Username',font='Ariel 15').grid(row=2,column=1,padx=5,pady=5)
-        Entry(qua,text='Username',textvariable='user',font='Ariel 15').grid(row=2,column=2,padx=5,pady=5)
-        qua.destroy()
-        return
-    except:
-        qua.destroy()
-        sys.exit()
+def login():
+    def access():
+        global go
+        user=User.get()
+        pwd=int(pswd.get())
+        auth_ppl={'admin':110,'panda':141,'pup':111}
+        global u_s
+        u_s=str(user).lower()
+        if user.lower() in auth_ppl.keys():
+            if pwd is auth_ppl[u_s]:
+                time.sleep(1)
+                messagebox.showinfo('Access granted',' Welcome ' + user.upper())
+                go=True
+                qua.destroy()            
+                return True
+            else:
+                messagebox.showerror('Access Denied','False PASSWORD')
+                return False
+        elif user not in auth_ppl.keys():
+            print('Access denied-FALSE USER')
+            messagebox.showerror('Access Denied','False USERNAME')
+            return False
+    qua=Tk()
+    qua.geometry('300x300')
+    color='Lavender'
+    qua['bg']='Lavender'
+    qua.title('login')
+    Label(qua,text='L O G I N',font='Ariel',bg=color).grid(row=1,column=2,columnspan=2,padx=5,pady=5)
+    Label(qua,text='Username',font='Ariel',bg=color).grid(row=2,column=1,padx=5,pady=5)
+    User = Entry(qua, width=15, font=('Helvetica', 10))
+    User.grid(row=2,column=2,padx=5,pady=5)
+    User.insert(1,'Enter Username')
+    Label(qua,text='Password',font='Ariel',bg=color).grid(row=3,column=1,padx=5,pady=5)
+    pswd = Entry(qua, width=15, font=('Helvetica', 10))
+    pswd.grid(row=3,column=2,padx=5,pady=5)
+    pswd.insert(1,'Password')
+    Button(qua,text='Check Credentintials',command=access,font='Ariel',bg='sky blue').grid(row=4,column=2,padx=5,pady=5)
+    qua.mainloop()
 
+    
 def pollpage(): #page for polling
      def proceed():
         chose=choose.get()
@@ -58,6 +84,7 @@ def pollpage(): #page for polling
 
 def polls(): #mypolls
     def proceed():
+        global pollnames
         global plname
         plname=psel.get()
         if plname=='-select-':
@@ -72,17 +99,26 @@ def polls(): #mypolls
         data1=data[i]
         ndata=data1[0]
         pollnames.append(ndata)
+    def clear_list():
+        if data==['-select-']:
+            messagebox.showinfo('Success!','Polls deleted')    
+        else:
+            cursor.execute('delete from poll')
+            messagebox.showinfo('Success!','Polls deleted')
+            mpolls.destroy()
     psel=StringVar()
     mpolls=Toplevel()
     mpolls.geometry('300x300')
+    color='#FAF0E6'
     mpolls['bg']='#FAF0E6'
     mpolls.title('Voting Program')
-    Label(mpolls,text='Select Poll',font='Helvetica 12 bold').grid(row=1,column=3)
+    Label(mpolls,text='Select Poll',font='Helvetica 12 bold',bg=color).grid(row=1,column=3)
     select=ttk.Combobox(mpolls,values=pollnames,state='readonly',textvariable=psel)
     select.grid(row=2,column=3,padx=10,pady=10)
     select.current(0)
     Button(mpolls,text='Proceed',command=proceed).grid(row=2,column=4,padx=5,pady=5)
-
+    Button(mpolls,text='Clear list',command=clear_list).grid(row=2,column=5,padx=5,pady=5)
+    
 
 
 def create():
@@ -116,16 +152,17 @@ def create():
     cname=StringVar()
     cr=Toplevel()
     cr.geometry('560x440')
+    color='#FAF0E6'
     cr['bg']='#FAF0E6'
     cr.title('Create a new poll')
-    Label(cr,text='Enter Details',font='Helvetica 12 bold').grid(row=1,column=2)
-    Label(cr,text='Enter Poll name: ').grid(row=2,column=1)
+    Label(cr,text='Enter Details',font='Helvetica 12 bold',bg=color).grid(row=1,column=2)
+    Label(cr,text='Enter Poll name: ',bg=color).grid(row=2,column=1)
     Entry(cr,width=40,textvariable=name).grid(row=2,column=2,padx=2,pady=3,sticky='nsw') #poll name
-    Label(cr,text='(eg: captain elections)').place(x=353,y=35)
-    Label(cr,text='Enter Candidates: ').grid(row=3,column=1,columnspan=1,padx=2,pady=3)
+    Label(cr,text='(eg: captain elections)',bg=color).place(x=353,y=35)
+    Label(cr,text='Enter Candidates: ',bg=color).grid(row=3,column=1,columnspan=1,padx=2,pady=3)
     Entry(cr,width=40,textvariable=cname,font='Sans 12').grid(row=3,column=2,columnspan=1,padx=2,pady=3,sticky='w') #candidate name
-    Label(cr,text='Note: Enter the candidate names one by one by putting commas').grid(row=4,column=2)
-    Label(cr,text='eg: candidate1,candate2,candidate3....').grid(row=5,column=2)
+    Label(cr,text='Note: Enter the candidate names one by one by putting commas',bg=color).grid(row=4,column=2)
+    Label(cr,text='eg: candidate1,candate2,candidate3....',bg=color).grid(row=5,column=2)
     Button(cr,text='Proceed',command=proceed).grid(row=6,column=2)
 def selpl(): #pollresults
     def results():
@@ -177,21 +214,30 @@ def selpl(): #pollresults
     sel.grid(row=2,column=1)
     sel.current(0)
     Button(pl,text='Get Results',command=results).grid(row=2,column=2)
+
 def about():
-    messagebox.showinfo('About','Developed by Andrew')
+    messagebox.showinfo('About','Developed by Trimastishk')
 
-#______________________________________________________________________
-home=Tk()
-home.geometry('340x340')
-home.title('Voting Program')
-home.iconbitmap('C:\\Users\\computer lab\\Desktop\\V-111\\qqq.ico')
-home['bg'] = '#00CCFF'
-Label(home,text='Voting program made in python',font='Helvetica 12 italic',bg='#00CCFF').pack(pady=5)
-Button(home,text='Create new Poll +',command=create,width=20).pack(pady=5,padx=10)
-Button(home,text='My Polls',command=polls,width=20).pack(pady=5,padx=10)
-Button(home,text='Poll Results',command=selpl,width = 20).pack(pady=5,padx=10)
-Button(home,text='About',command=about,width=20).pack(padx=5,pady=5)  
-#Label(home,text='GitHub:https://github.com/andrew-geeks',bg='#49A').grid(row=6,column=2)
-#Label(home,text='Instagram:https://www.instagram.com/_andrewgeeks/',bg='#49A').grid(row=7,column=2)
 
-home.mainloop()
+def exit1():
+    qua.destroy()
+    home.destroy()
+
+#__________________________________________________________________
+go=False
+login()
+if go:
+    home=Toplevel()
+    home.geometry('340x340')
+    home.title('Voting Program')
+    #home.iconbitmap('C:\\Users\\computer lab\\Desktop\\V-111\\qqq.ico')
+    home['bg'] = '#00CCFF'
+    Label(home,text='Voting program made in python',font='Helvetica 12 italic',bg='#00CCFF').pack(pady=5)
+    Button(home,text='Create new Poll +',command=create,width=20).pack(pady=5,padx=10)
+    Button(home,text='My Polls',command=polls,width=20).pack(pady=5,padx=10)
+    Button(home,text='Poll Results',command=selpl,width = 20).pack(pady=5,padx=10)
+    Button(home,text='About',command=about,width=20).pack(padx=5,pady=5)
+    Button(home,text='Exit Program',command=exit1,width=10,bg='black',fg='white').pack(padx=5,pady=5)
+    #Label(home,text='GitHub:https://github.com/andrew-geeks',bg='#49A').grid(row=6,column=2)
+    #Label(home,text='Instagram:https://www.instagram.com/_andrewgeeks/',bg='#49A').grid(row=7,column=2)
+    home.mainloop()
