@@ -1,9 +1,11 @@
-import tkinter 
+import tkinter
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter import filedialog as fd
+from PIL import Image, ImageTk
+
 import sqlite3 as sqltor
 import matplotlib.pyplot as plt
 import time
@@ -45,17 +47,18 @@ def login():
     Label(qua,text='Username',font='Ariel',bg=color).grid(row=2,column=1,padx=5,pady=5)
     User = Entry(qua, width=15, font=('Helvetica', 10))
     User.grid(row=2,column=2,padx=5,pady=5)
-    User.insert(1,'')
+    User.insert(1,'admin')
     Label(qua,text='Password',font='Ariel',bg=color).grid(row=3,column=1,padx=5,pady=5)
     pswd = Entry(qua, width=15, font=('Helvetica', 10))
     pswd.grid(row=3,column=2,padx=5,pady=5)
-    pswd.insert(1,'Password')
+    pswd.insert(1,'110')
     Button(qua,text='Check Credentintials',command=access,font='Ariel',bg='sky blue').grid(row=4,column=2,padx=5,pady=5)
     qua.mainloop()
 
     
 def pollpage(): #page for polling
      def proceed():
+        global lon 
         chose=choose.get()
         print(chose)
         command='update polling set votes=votes+1 where name=?'
@@ -64,23 +67,32 @@ def pollpage(): #page for polling
         messagebox.showinfo('Success!','You have voted')
      choose=StringVar()
      names=[]
+     adds=[]
      pd=sqltor.connect(plname+'.db') #poll database
      pcursor=pd.cursor() #poll cursor
      pcursor.execute('select name from polling')
      data=pcursor.fetchall()
+     pcursor.execute('select image from polling')
+     img=pcursor.fetchall()
      for i in range(len(data)):
-         data1=data[i]
-         ndata=data1[0]
+         data1,img1=data[i],img[i]
+         ndata,nimg=data1[0],img1[0]
          names.append(ndata)
+         adds.append(nimg)
      print(names)
      ppage=Toplevel()
      ppage.geometry('300x300')
      ppage.title('Poll')
-
-
      Label(ppage,text='Vote for any one person!').grid(row=1,column=3)
      for i in range(len(names)):
-         Radiobutton(ppage,text=names[i],value=names[i],variable=choose).grid(row=2+i,column=1)
+         #prime=ImageTk.PhotoImage(Image.open(nimg[i]))
+         img = Image.open(nimg[i])
+         img = img.resize((250, 250), Image.ANTIALIAS)
+         img = ImageTk.PhotoImage(img)
+         panel = Label(ppage, image=img)
+         panel.image = img
+         panel.grid(row=2+i,column=1,padx=5,pady=5)
+         Radiobutton(ppage,text=names[i],value=names[i],variable=choose).grid(row=2+i,column=2,padx=5,pady=5)
      Button(ppage,text='Vote',command=proceed).grid(row=2+i+1,column=2)
 
 
@@ -127,15 +139,17 @@ def polls(): #mypolls
 def create():
     def proceed():
         global pcursor
+        global lon
         pname=name.get() #pollname
         can=cname.get()   #candidatename
+
         if pname=='':
             return messagebox.showerror('Error','Enter poll name')
         elif can=='':
             return messagebox.showerror('Error','Enter candidates')
         else:
             candidates=can.split(',') #candidate list
-            cursor.execute('delete from poll')
+            can_add=lon #candidatepicaddress
             command='insert into poll (name) values (?);'
             cursor.execute(command,(pname,))
             conn.commit()
@@ -143,16 +157,38 @@ def create():
             pcursor=pd.cursor() #poll cursor
             pcursor.execute('drop table if exists polling')
             pcursor.execute("""CREATE TABLE polling
-                 (name TEXT,votes INTEGER)""")
+                 (name TEXT,votes INTEGER,image TEXT)""")
             for i in range(len(candidates)):
-                command='insert into polling (name,votes) values (?, ?)'
-                data=(candidates[i],0)
+                command='insert into polling (name,votes,image) values (?, ?, ?)'
+                data=(candidates[i],0,lon[i])
                 pcursor.execute(command,data)
                 pd.commit()
             pd.close()
             messagebox.showinfo('Success!','Poll Created')
             cr.destroy()
-
+    def grey():
+        global lon
+        p=cname.get()
+        q=p.split(',')
+        small=Toplevel()
+        small['bg']='Cyan'
+        lon=[]
+        def snatch():
+            for i in range(len(q)):
+                var=chr(i+65)
+                lon.append(globals()[var].get())
+                print(lon)
+            messagebox.showinfo('Success!','Addresses Saved')
+            small.destroy()
+            proceed()
+        for i in range(len(q)):
+            var=chr(i+65)
+            globals()[var]=StringVar()
+            Label(small,width=30,text='Enter_img_address_of_'+str(q[i])).grid(row=i+1,column=2,columnspan=1,padx=15,pady=10,sticky='nsew')
+            Entry(small,width=30,textvariable=globals()[var]).grid(row=i+1,column=3,columnspan=1,padx=15,pady=10,sticky='nsew')
+        
+        Button(small,text='Submit',command=snatch,width=6).grid(row=i+1,column=4,columnspan=1,padx=5,pady=5,sticky='nsew')
+    
     name=StringVar()
     cname=StringVar()
     cr=Toplevel()
@@ -165,10 +201,12 @@ def create():
     Entry(cr,width=40,textvariable=name).grid(row=2,column=2,padx=2,pady=3,sticky='nsw') #poll name
     Label(cr,text='(eg: captain elections)',bg=color).place(x=353,y=35)
     Label(cr,text='Enter Candidates: ',bg=color).grid(row=3,column=1,columnspan=1,padx=2,pady=3)
-    Entry(cr,width=40,textvariable=cname,font='Sans 12').grid(row=3,column=2,columnspan=1,padx=2,pady=3,sticky='w') #candidate name
+    Entry(cr,width=40,textvariable=cname).grid(row=3,column=2,columnspan=1,padx=2,pady=3,sticky='w') #candidate name
     Label(cr,text='Note: Enter the candidate names one by one by putting commas',bg=color).grid(row=4,column=2)
     Label(cr,text='eg: candidate1,candate2,candidate3....',bg=color).grid(row=5,column=2)
-    Button(cr,text='Proceed',command=proceed).grid(row=6,column=2)
+    Button(cr,text='Proceed',command=grey).grid(row=6,column=2)
+    #Button(cr,text='Proceed',command=proceed).grid(row=6,column=2)
+
 def selpl(): #pollresults
     def results():
         sel=sele.get()  #selected option
@@ -229,18 +267,18 @@ def exit1():
     home.destroy()
 
 #__________________________________________________________________
-go=False
-login()
+go=True
+#login()
 if go:
     home=Tk()
-    home.geometry('340x340')
-    home.title('Voting Program')
+    home.geometry('550x550')
     #home.iconbitmap('C:\\Users\\computer lab\\Desktop\\V-111\\qqq.ico')
     home['bg'] = '#00CCFF'
-    Label(home,text='Voting program made in python',font='Helvetica 12 italic',bg='#00CCFF').pack(pady=5)
-    Button(home,text='Create new Poll +',command=create,width=20).pack(pady=5,padx=10)
-    Button(home,text='My Polls',command=polls,width=20).pack(pady=5,padx=10)
-    Button(home,text='Poll Results',command=selpl,width = 20).pack(pady=5,padx=10)
-    Button(home,text='About',command=about,width=20).pack(padx=5,pady=5)
-    Button(home,text='Exit Program',command=exit1,width=10,bg='black',fg='white').pack(padx=5,pady=5)
+    b,c='black','white'
+    Label(home,text='Voting program made in python',font='Helvetica 28 italic',bg='#00CCFF').grid(row=0,column=1,columnspan=3,pady=25)
+    Button(home,text='Create new Poll +',command=create,width=30,height=5,bg=b,fg=c).grid(row=1,column=1,pady=5,padx=10,columnspan=2)
+    Button(home,text='My Polls',command=polls,width=30,height=5,bg=b,fg=c).grid(row=2,column=1,pady=10,padx=20,columnspan=2)
+    Button(home,text='Poll Results',command=selpl,width = 30,height=5,bg=b,fg=c).grid(row=1,column=3,pady=10,padx=20,columnspan=2)
+    Button(home,text='About',command=about,width=30,height=5,bg=b,fg=c).grid(row=2,column=3,pady=10,padx=20,columnspan=2)
+    Button(home,text='Exit Program',command=exit1,width=30,height=3,bg='black',fg='white').grid(row=3,column=1,pady=10,columnspan=3)
     home.mainloop()
