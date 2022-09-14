@@ -267,8 +267,8 @@ def exit1():
     home.destroy()
 
 #__________________________________________________________________
-go=True
-#login()
+go=False
+login()
 if go:
     home=Tk()
     home.geometry('550x550')
