@@ -15,6 +15,13 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS poll
                     (name)""")
 
 def login():
+    def lookup():
+        if pswd.cget('show') == '':
+            pswd.config(show='*')
+            lol.config(text='Show Password')
+        else:
+            pswd.config(show='')
+            lol.config(text='Hide Password')
     def access():
         global go
         user=User.get()
@@ -39,11 +46,12 @@ def login():
             return False
             qua.destroy() 
     qua=Tk()
-    qua.geometry('300x300')
+    qua.geometry('360x300')
     color='Lavender'
     qua['bg']='Lavender'
     qua.title('login')
-    Label(qua,text='L O G I N',font='Ariel',bg=color).grid(row=1,column=2,columnspan=2,padx=5,pady=5)
+    
+    Label(qua,text='L O G I N',font='Ariel 16 bold',bg=color).grid(row=1,column=2,columnspan=3,pady=5)
     Label(qua,text='Username',font='Ariel',bg=color).grid(row=2,column=1,padx=5,pady=5)
     User = Entry(qua, width=15, font=('Helvetica', 10))
     User.grid(row=2,column=2,padx=5,pady=5)
@@ -52,7 +60,9 @@ def login():
     pswd = Entry(qua, width=15, font=('Helvetica', 10),show='*')
     pswd.grid(row=3,column=2,padx=5,pady=5)
     pswd.insert(1,'110')
-    Button(qua,text='Check Credentintials',command=access,font='Ariel',bg='sky blue').grid(row=4,column=2,padx=5,pady=5)
+    lol=Button(qua,text='Show Password',command=lookup,bg='gold')
+    lol.grid(row=3,column=3,pady=5)
+    Button(qua,text='Check Credentintials',command=access,font='Ariel',bg='gold').grid(row=4,column=2,padx=5,pady=5)
     qua.mainloop()
 
 def sound():
