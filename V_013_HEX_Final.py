@@ -3,8 +3,6 @@ import winsound
 import sqlite3 as sqltor
 import matplotlib.pyplot as plt
 import time
-import datetime
-import pytz
 import os
 from tkinter import *
 from tkinter import ttk
@@ -12,14 +10,15 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter import filedialog as fd
 from PIL import Image, ImageTk
-from time import strftime
+
 
 conn=sqltor.connect('main.db') #main database
 cursor=conn.cursor() #main cursor
 cursor.execute("""CREATE TABLE IF NOT EXISTS poll(name)""")
 img_path=str('G:\\1Platinum\sam_pics')
 icon_path=None
-
+auth_ppl={'admin':110,'panda':141,'pup':111}
+os.chdir('G:\\1Platinum\\quantum')
 
 def login(prime):
     if prime==1:
@@ -34,7 +33,6 @@ def login(prime):
             global go
             user=User.get()
             pwd=int(pswd.get())
-            auth_ppl={'admin':110,'panda':141,'pup':111}
             global u_s
             u_s=str(user).lower()
             if user.lower() in auth_ppl.keys():
@@ -56,7 +54,7 @@ def login(prime):
         color='Lavender'
         qua['bg']='Lavender'
         qua.title('login')
-        showtime(qua,3,'lavender')
+        showtime(qua,'lavender',3)
         Label(qua,text='L O G I N',font='Ariel 16 bold',bg=color).grid(row=1,column=1,columnspan=3,pady=5)
         Label(qua,text='Username',font='Ariel',bg=color).grid(row=2,column=1,padx=5,pady=5)
         User = Entry(qua, width=15, font=('Helvetica', 10))
@@ -70,8 +68,8 @@ def login(prime):
         lol.grid(row=3,column=3,pady=5)
         Button(qua,text='Check Credentintials',command=access,font='Ariel',bg='gold').grid(row=4,column=2,pady=2)
         qua.mainloop()
+    
     elif prime==2:
-        
         def lookup():
             if pswd.cget('show') == '':
                 pswd.config(show='*')
@@ -80,64 +78,66 @@ def login(prime):
                 pswd.config(show='')
                 lol.config(text='Hide Password')
         def access():
-            def tata():
-                qua.destroy()
-            global go
+            global letgo
             global u_s
             user=User.get()
             pwd=int(pswd.get())
-            auth_ppl={'admin':110,'panda':141,'pup':111}
             u_s=str(user).lower()
             if u_s in auth_ppl.keys():
                 if pwd is auth_ppl[u_s]:
-                    go=True
-                    qua.destroy()          
+                    letgo=True
+                    qua.destroy()
+                    return True
                 else:
                     messagebox.showerror('Access Denied','False PASSWORD')
                     qua.destroy()
+                    raise SystemExit(y)
                     return False
+                
             else:
                 messagebox.showerror('Access Denied','False USERNAME')
                 tata()
                 return False
-                
+        def tata():
+                qua.destroy()
         qua=Tk()
         qua.geometry('350x300')
         color='Lavender'
         qua['bg']='Lavender'
-        qua.title('login')
-        Label(qua,text='VERIFY',font='Ariel 16 bold',bg=color).grid(row=1,column=1,columnspan=3,pady=5)
+        qua.title('VERIFY')
+        Label(qua,text='A U T H O R I S E',font='Ariel 16 bold',bg=color).grid(row=1,column=1,columnspan=3,pady=5)
         Label(qua,text='Username',font='Ariel',bg=color).grid(row=2,column=1,padx=5,pady=5)
         User = Entry(qua, width=15, font=('Helvetica', 10))
         User.grid(row=2,column=2,padx=5,pady=5)
-        User.insert(1,'admin')
         Label(qua,text='Password',font='Ariel',bg=color).grid(row=3,column=1,padx=5,pady=5)
         pswd = Entry(qua, width=15, font=('Helvetica', 10),show='*')
         pswd.grid(row=3,column=2,padx=5,pady=5)
-        pswd.insert(1,'110')
         lol=Button(qua,text='Show Password',command=lookup,bg='gold')
         lol.grid(row=3,column=3,pady=5)
-        Button(qua,text='Check Credentintials',command=access,font='Ariel',bg='gold').grid(row=4,column=2,pady=2)
+        Button(qua,text='Verify exit',command=access,font='Ariel',bg='gold').grid(row=4,column=2,pady=2)
         Button(qua,text='Return to poll',command=tata).grid(row=5,column=2,pady=2)
         qua.mainloop()
 
 def sound():
     winsound.PlaySound('beep', winsound.SND_FILENAME)
 
-def showtime(fan,col,color,roo=1):
-    def tome():
-        string = strftime('%H:%M:%S %p')
+def showtime(main,clr,col,roo=1):
+   def tome():
+        string =time.strftime('%H:%M:%S %p')
         lbl.config(text = string)
-        lbl.after(1000, tome)
-    lbl=Label(fan, font ='calibri 10 bold',bg=color)
-    lbl.grid(row=roo,column=col,padx=5,pady=5)
-    tome()
-
+        lbl.after(10000,tome)
+   lbl=Label(main, font ='calibri 10 bold',bg=clr)
+   lbl.grid(row=roo,column=col,padx=5,pady=5)
+   tome()
 
 def pollpage(): #page for polling
     global position
     def goaway():
         ppage.destroy()
+        #global letgo, ppage
+        letgo=False
+        #login(2)
+                   
     def play_pause():
         proceed()
         b1['state']='disabled'
@@ -211,14 +211,14 @@ def polls(): #mypolls
         ndata=data1[0]
         pollnames.append(ndata)
     def clear_list():
-        if data==['-select-']:
-            cursor.execute('drop table poll')
-            messagebox.showinfo('Success!','Polls deleted')   
-        else:
-            cursor.execute('drop table poll')
-            cursor.execute("""CREATE TABLE IF NOT EXISTS poll (name)""")
-            messagebox.showinfo('Success!','Polls deleted')
-            mpolls.destroy()
+        global cwd
+        cursor.execute('drop table poll')
+        cursor.execute("""CREATE TABLE IF NOT EXISTS poll (name)""")
+        os.remove(cwd)
+        os.mkdir(cwd)
+        os.chdir(cwd)
+        mpolls.destroy()
+        messagebox.showinfo('Success!','Polls deleted')
     psel=StringVar()
     mpolls=Toplevel()
     mpolls.geometry('300x300')
@@ -248,7 +248,7 @@ def create():
         pcursor=pd.cursor() #poll cursor
         pcursor.execute('drop table if exists polling')
         pcursor.execute("""CREATE TABLE polling
-             (name TEXT,votes INTEGER,image TEXT)""")
+             (name TEXT primary key,votes INTEGER,image TEXT)""")
         for i in range(len(candidates)):
             command='insert into polling (name,votes,image) values (?, ?, ?)'
             if lon[i]=='':
@@ -283,13 +283,14 @@ def create():
                 messagebox.showinfo('Success!','Addresses Saved')
                 small.destroy()
                 proceed()
+            Label(small,bg='cyan',text='Enter image addresses').grid(row=1,column=2,columnspan=2)
+            Label(small,bg='cyan',text='Leave empty for default image').grid(row=2,column=2,columnspan=2)
             for i in range(len(q)):
                 var=chr(i+65)
                 globals()[var]=StringVar()
-                Label(small,bg='cyan',width=30,text='Enter_img_address_of_'+str(q[i])).grid(row=i+1,column=2,columnspan=1,padx=25,pady=15,sticky='nsew')
-        
-                Entry(small,width=40,textvariable=globals()[var]).grid(row=i+1,column=3,columnspan=1,padx=25,pady=15,sticky='nsew')
-            Button(small,text='Submit',command=snatch,width=6).grid(row=i+1,column=4,columnspan=1,padx=5,pady=5,sticky='nsew')
+                Label(small,bg='cyan',width=30,text='Enter_img_address_of "'+str(q[i])+'\"').grid(row=i+3,column=2,columnspan=1,padx=25,pady=15,sticky='nsew')
+                Entry(small,width=40,textvariable=globals()[var]).grid(row=i+3,column=3,columnspan=1,padx=25,pady=15,sticky='nsew')
+            Button(small,text='Submit',command=snatch,width=6).grid(row=i+4,column=2,columnspan=2,padx=5,pady=5,sticky='nsew')
     
     name=StringVar()
     cname=StringVar()
@@ -298,17 +299,17 @@ def create():
     color='#FAF0E6'
     cr['bg']='#FAF0E6'
     cr.title('Create a new poll')
-    showtime(cr,3,'#FAF0E6',1)
+
     Label(cr,text='Enter Details',font='Helvetica 12 bold',bg=color).grid(row=1,column=2)
     Label(cr,text='Enter Poll name: ',bg=color).grid(row=2,column=1)
     Entry(cr,width=40,textvariable=name).grid(row=2,column=2,padx=2,pady=3,sticky='nsw') #poll name
-    Label(cr,text='(eg: captain elections)',bg=color).place(x=353,y=35)
+    Label(cr,text='(eg: school elections)',bg=color).place(x=353,y=35)
     Label(cr,text='Enter Candidates: ',bg=color).grid(row=3,column=1,columnspan=1,padx=2,pady=3)
     Entry(cr,width=40,textvariable=cname).grid(row=3,column=2,columnspan=1,padx=2,pady=3,sticky='w') #candidate name
-    Label(cr,text='Note: Enter the candidate names one by one by putting commas',bg=color).grid(row=4,column=2)
+    Label(cr,text='Note: Enter the candidate names by putting commas',bg=color).grid(row=4,column=2)
     Label(cr,text='eg: candidate1,candate2,candidate3....',bg=color).grid(row=5,column=2)
     Button(cr,text='Proceed',command=grey).grid(row=6,column=2)
-    #Button(cr,text='Proceed',command=proceed).grid(row=6,column=2)
+    
 
 def selpl(): #pollresults
     def close_page():
@@ -329,12 +330,15 @@ def selpl(): #pollresults
                     names.append(data[0])
                     votes.append(data[1])
                     plt.title('Poll Result')
-                plt.pie(votes,labels=names,autopct='%1.1f%%',shadow=True,startangle=140)
-                plt.axis('equal')
-                plt.show()
+                if sum(votes)==0:
+                    messagebox.showerror('NUll data','No data to project')
+                    close_pg()
+                else:
+                    plt.pie(votes,labels=names,autopct='%1.1f%%',shadow=True,startangle=140)
+                    plt.axis('equal')
+                    plt.show()
 
             res=Toplevel() #result-page
-
             res.title('Results!')
             Label(res,text='Here is the Result!',font=('Helvetica 12 bold')).grid(row=1,column=2,padx=10,pady=10)
             con=sqltor.connect(sel+'.db')
@@ -365,6 +369,7 @@ def selpl(): #pollresults
     sel.current(0)
     Button(pl,text='Get Results',command=results).grid(row=2,column=2,padx=25,pady=20)
     Button(pl,text='EXIT',command=close_page).grid(row=3,column=2,padx=25,rowspan=2)
+
 def about():
     def startup():
         messagebox.showinfo('About','Developed by Trimastishk')
@@ -380,15 +385,15 @@ def about():
 def exit1():
     global outside
     home.destroy()
-    outside=datetime.datetime.now(pytz.timezone('Asia/Kolkata'))
+    
 
 #__________________________________________________________________
 go=False #Key
 login(1) # Key authoriser
-inside=datetime.datetime.now(pytz.timezone('Asia/Kolkata'))
+
 if go: #Accessing Menupage/HomePage
     home=Tk()
-    home.geometry('540x500')
+    home.title('Main menu')
     #home.iconbitmap('C:\\Users\\computer lab\\Desktop\\V-111\\qqq.ico')
     home['bg'] = '#00CCFF'
     b,c='black','white'
