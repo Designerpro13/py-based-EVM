@@ -380,10 +380,9 @@ def about():
     Label(abtwin,text='Latest patch on Sun Sep 26 17:33:55 2022',font='Monotype_Corsiva 16').pack(anchor='center')
     Label(abtwin,text='@source instructions: github.com/designerpro13',font='Monotype_Corsiva 16').pack(anchor='center')
     Label(abtwin,text='Highly custamisable, reliable and accurate',font='Monotype_Corsiva 16').pack(anchor='center')
-    Button(abtwin,text='Start polling!!',command=startup)
+    Button(abtwin,text='Start polling!!',command=startup).pack()
 
 def exit1():
-    global outside
     home.destroy()
     
 
